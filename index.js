@@ -35,37 +35,71 @@ var handlers = {
 
         unirest.post('https://dotgames.atodd.io/api/create/party')
         .headers({'Content-Type': 'multipart/form-data'})
-        .field("alexa-id", ALEXA_ID)
-        .field("game-name", gameType)
+        .field("alexa_id", ALEXA_ID)
+        .field("game_name", gameType)
         .end(function (response) {
-          var party_code = response.body.party_code + '';
           var speech = new Speech();
-          speech.say("Your lobby pin is: ");
-          for(var i = 0; i < party_code.length; i++)
-          {
-            speech.pause('.25s');
-            speech.say(party_code[i]);
+          console.log(response.statusCode);
+          if(response.statusCode != 200){
+            speech.say("Could not create game");
+            var speechOutput = speech.ssml(true);
+            self.emit(':tell', speechOutput);
           }
-          var speechOutput = speech.ssml(true);
-          //var speechOutput = "Lobby PIN: " + party_code;
-          self.emit(':tell', speechOutput);
+          else{
+            var party_code = response.body.party_code + '';
+            speech.say("Your lobby pin is: ");
+            for(var i = 0; i < party_code.length; i++)
+            {
+              speech.pause('.25s');
+              speech.say(party_code[i]);
+            }
+            var speechOutput = speech.ssml(true);
+            self.emit(':tell', speechOutput);
+          }
         })
+    },
 
+    'StartGame': function () {
+      var ALEXA_ID = this.event.context.System.device.deviceId;
+      var self = this;
+      unirest.post('https://dotgames.atodd.io/api/party/start')
+      .headers({'Content-Type': 'multipart/form-data'})
+      .field("alexa_id", ALEXA_ID)
+      .end(function (response) {
+        console.log(ALEXA_ID);
+        var speech = new Speech();
+        console.log(response.statusCode);
+        if(response.statusCode != 200){
+          speech.say("Could not start game");
+          var speechOutput = speech.ssml(true);
+          self.emit(':tell', speechOutput);
+        }
+        else{
+          speech.say("Game started successfully, please follow on screen instructions");
+          var speechOutput = speech.ssml(true);
+          self.emit(':tell', speechOutput);
+        }
+      })
+    },
 
+    'ReadLib': function () {
+      var ALEXA_ID = this.event.context.System.device.deviceId;
+      var self = this;
 
-
-
-
-
-
-
-
-        //var req = unirest("POST", "http://api.whatdoestrumpthink.com/api/v1/quotes/random");
-        /*req.end(function (res) {
-          if (res.error) throw new Error(res.error);
-          console.log(res.body);
-          callback("Hello World");
-        });*/
+      unirest.get('https://dotgames.atodd.io/api/madlib')
+      .headers({'Content-Type': 'multipart/form-data'})
+      .field("alexa_id", ALEXA_ID)
+      .end(function (response) {
+        var lines = response.body.lines;
+        var speech = new Speech();
+        for(var i = 0; i < lines.length; i++)
+        {
+          speech.pause('.35s');
+          speech.say(lines[i]);
+        }
+        var speechOutput = speech.ssml(true);
+        self.emit(':tell', speechOutput);
+      })
     },
 
     //BUILT-IN ALEXA INTENTS
