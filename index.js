@@ -86,7 +86,7 @@ var handlers = {
       var ALEXA_ID = this.event.context.System.device.deviceId;
       var self = this;
 
-      unirest.get('https://dotgames.atodd.io/api/madlib')
+      unirest.post('https://dotgames.atodd.io/api/madlib')
       .headers({'Content-Type': 'multipart/form-data'})
       .field("alexa_id", ALEXA_ID)
       .end(function (response) {
