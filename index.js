@@ -3,8 +3,8 @@ var unirest = require("unirest");
 var Alexa = require('alexa-sdk');
 
 var APP_ID = process.env.ID;
-var SKILL_NAME = "dot GAMES";
-var HELP_MESSAGE = "Welcorocess.env.ENV_VARIABLEme to dot games.";
+var SKILL_NAME = "dotGAMES";
+var HELP_MESSAGE = "Welcome to dot games.";
 var HELP_REPROMPT = "You are still using dot games.";
 var STOP_MESSAGE = "Goodbye.";
 
