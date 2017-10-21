@@ -4,7 +4,7 @@ var Alexa = require('alexa-sdk');
 
 var APP_ID = process.env.ID;
 var SKILL_NAME = "dotGAMES";
-var HELP_MESSAGE = "Welcome to dot games.";
+var HELP_MESSAGE = "What game would you like to play?";
 var HELP_REPROMPT = "You are still using dot games.";
 var STOP_MESSAGE = "Goodbye.";
 
@@ -20,8 +20,10 @@ var handlers = {
         var speechOutput = "Welcome to dot Games! "+HELP_MESSAGE;
         this.emit(':ask', speechOutput, HELP_REPROMPT);
     },
-    'SayHello': function () {
-        var speechOutput = "dot Games says hello!";
+    'PlayGame': function () {
+        var intentObj = this.intent;
+        var game = intentObj.slots.Game.value;
+        var speechOutput = "Starting " + intentObj;
         this.emit(':tell', speechOutput, STOP_MESSAGE);
     },
     'AMAZON.HelpIntent': function () {
