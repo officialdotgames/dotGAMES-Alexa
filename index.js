@@ -1,6 +1,9 @@
+require('dotenv').load();
 'use strict';
+
 var unirest = require("unirest");
 var Alexa = require('alexa-sdk');
+var Speech = require('ssml-builder');
 
 var APP_ID = process.env.ID;
 var SKILL_NAME = "dotGAMES";
@@ -10,22 +13,62 @@ var STOP_MESSAGE = "Goodbye.";
 
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
-    alexa.APP_ID = APP_ID;
+    alexa.appId = APP_ID;
     alexa.registerHandlers(handlers);
     alexa.execute();
 };
 
 var handlers = {
     'LaunchRequest': function () {
-        var speechOutput = "Welcome to dot Games! "+HELP_MESSAGE;
+        var speechOutput = "Welcome to dot Games!"+HELP_MESSAGE;
         this.emit(':ask', speechOutput, HELP_REPROMPT);
     },
-    'PlayGame': function () {
-        var intentObj = this.intent;
-        var game = intentObj.slots.Game.value;
-        var speechOutput = "Starting " + intentObj;
-        this.emit(':tell', speechOutput, STOP_MESSAGE);
+
+    //USER-DEFINED INTENTS
+    'CreateGame': function () {
+        var ALEXA_ID = this.event.context.System.device.deviceId;
+        var gameType = this.event.request.intent.slots.Game.value;
+        var speechOutput = "Starting " + this.event.request.intent.slots.Game.value;
+
+        var self = this;
+
+
+        unirest.post('https://dotgames.atodd.io/api/create/party')
+        .headers({'Content-Type': 'multipart/form-data'})
+        .field("alexa-id", ALEXA_ID)
+        .field("game-name", gameType)
+        .end(function (response) {
+          var party_code = response.body.party_code + '';
+          var speech = new Speech();
+          speech.say("Your lobby pin is: ");
+          for(var i = 0; i < party_code.length; i++)
+          {
+            speech.pause('.25s');
+            speech.say(party_code[i]);
+          }
+          var speechOutput = speech.ssml(true);
+          //var speechOutput = "Lobby PIN: " + party_code;
+          self.emit(':tell', speechOutput);
+        })
+
+
+
+
+
+
+
+
+
+
+        //var req = unirest("POST", "http://api.whatdoestrumpthink.com/api/v1/quotes/random");
+        /*req.end(function (res) {
+          if (res.error) throw new Error(res.error);
+          console.log(res.body);
+          callback("Hello World");
+        });*/
     },
+
+    //BUILT-IN ALEXA INTENTS
     'AMAZON.HelpIntent': function () {
         this.emit(':ask', HELP_MESSAGE, HELP_REPROMPT);
     },
@@ -40,14 +83,3 @@ var handlers = {
         this.emit(':ask', speechOutput, STOP_MESSAGE);
     },
 };
-
-function handleRequest(callback) {
-    /*var speechOutput = "";
-    var req = unirest("GET", "http://api.whatdoestrumpthink.com/api/v1/quotes/random");*/
-
-    //req.end(function (res) {
-    //  if (res.error) throw new Error(res.error);
-    //  console.log(res.body);
-      callback("Hello World");
-    //});
-}
