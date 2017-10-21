@@ -2,10 +2,10 @@
 var unirest = require("unirest");
 var Alexa = require('alexa-sdk');
 
-var APP_ID = "amzn1.ask.skill.d73464c9-7de3-45c2-9064-df6cc9d95d6d";
-var SKILL_NAME = "Trump Quotes";
-var HELP_MESSAGE = "You can ask Trump for a Quote by saying tell me a quote";
-var HELP_REPROMPT = "You can ask trump for a quote by saying tell me a quote or you can quit by saying quit.";
+var APP_ID = process.env.ID;
+var SKILL_NAME = "dot GAMES";
+var HELP_MESSAGE = "Welcorocess.env.ENV_VARIABLEme to dot games.";
+var HELP_REPROMPT = "You are still using dot games.";
 var STOP_MESSAGE = "Goodbye.";
 
 exports.handler = function(event, context, callback) {
@@ -17,14 +17,12 @@ exports.handler = function(event, context, callback) {
 
 var handlers = {
     'LaunchRequest': function () {
-        var speechOutput = "Welcome to Trump Quotes! "+HELP_MESSAGE;
+        var speechOutput = "Welcome to dot Games! "+HELP_MESSAGE;
         this.emit(':ask', speechOutput, HELP_REPROMPT);
     },
-    'Trump': function () {
-        var self = this;
-        handleRequest(function(speechOutput) {
-            self.emit(':tellWithCard', speechOutput, SKILL_NAME, speechOutput);
-         });
+    'SayHello': function () {
+        var speechOutput = "dot Games says hello!";
+        this.emit(':tell', speechOutput, STOP_MESSAGE);
     },
     'AMAZON.HelpIntent': function () {
         this.emit(':ask', HELP_MESSAGE, HELP_REPROMPT);
@@ -42,12 +40,12 @@ var handlers = {
 };
 
 function handleRequest(callback) {
-    var speechOutput = "";
-    var req = unirest("GET", "http://api.whatdoestrumpthink.com/api/v1/quotes/random");
+    /*var speechOutput = "";
+    var req = unirest("GET", "http://api.whatdoestrumpthink.com/api/v1/quotes/random");*/
 
-    req.end(function (res) {
-      if (res.error) throw new Error(res.error);
-      console.log(res.body);
-      callback(res.body.message);
-    });
+    //req.end(function (res) {
+    //  if (res.error) throw new Error(res.error);
+    //  console.log(res.body);
+      callback("Hello World");
+    //});
 }
