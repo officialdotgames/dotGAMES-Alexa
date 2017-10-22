@@ -28,7 +28,8 @@ var handlers = {
     'CreateGame': function () {
         var ALEXA_ID = this.event.context.System.device.deviceId;
         var gameType = this.event.request.intent.slots.Game.value;
-        var speechOutput = "Starting " + this.event.request.intent.slots.Game.value;
+        var properInput = capitalizeFirstLetter(gameType);
+        var speechOutput = "Starting " + properInput;
 
         var self = this;
 
@@ -117,3 +118,7 @@ var handlers = {
         this.emit(':ask', speechOutput, STOP_MESSAGE);
     },
 };
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
